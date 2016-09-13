@@ -19,7 +19,41 @@ trait HasTranslations
             return parent::getAttributeValue($key);
         }
 
-        return $this->getTranslation($key, config('app.locale'));
+        return $this->getTranslation($key, app('translator')->getLocale());
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return HasTranslations|void
+     */
+    public function setAttribute($key, $value)
+    {
+        if (!$this->isTranslatableAttribute($key)) {
+            return parent::setAttribute($key, $value);
+        }
+        if (is_string($value)) {
+            return $this->setTranslation($key, app('translator')->getLocale(), $value);
+        }
+        return parent::setAttribute($key, $value);
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        $attributes = parent::toArray();
+        $hiddenAttributes = $this->getHidden();
+        foreach ($this->getTranslatableAttributes() as $field) {
+            if (in_array($field, $hiddenAttributes)) {
+                continue;
+            }
+            if ($translation = $this->getTranslation($field, app('translator')->getLocale())) {
+                $attributes[$field] = $translation;
+            }
+        }
+        return $attributes;
     }
 
     /**
