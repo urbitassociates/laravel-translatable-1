@@ -49,9 +49,8 @@ trait HasTranslations
             if (in_array($field, $hiddenAttributes)) {
                 continue;
             }
-            if ($translation = $this->getTranslation($field, app('translator')->getLocale())) {
-                $attributes[$field] = $translation;
-            }
+            $translation = $this->getTranslation($field, app('translator')->getLocale());
+            $attributes[$field] = $translation;
         }
         return $attributes;
     }
